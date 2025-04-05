@@ -1,6 +1,6 @@
 options:
   logging: CLOUD_LOGGING_ONLY  # Or you can set it to NONE, depending on your needs
-  logs_bucket: gs://cloud-build-logs-11  # Specify the logs bucket (replace with your bucket name)
+  
 
 steps:
   # Step 1: Build the Docker image

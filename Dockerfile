@@ -1,18 +1,20 @@
-# Use an official Node.js runtime as the base image
-FROM node:14
+# Use the official Python image from the Docker Hub
+FROM python:3.9-slim
 
 # Set the working directory inside the container
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copy the package.json and install dependencies
-COPY package*.json ./
-RUN npm install
+# Copy the current directory contents into the container
+COPY . /app
 
-# Copy the rest of the application code into the container
-COPY . .
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the port the app runs on
+# Make port 8080 available to the world outside the container
 EXPOSE 8080
 
-# Start the app
-CMD ["node", "app.js"]
+# Define environment variable
+ENV FLASK_APP=app.py
+
+# Run the application
+CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]

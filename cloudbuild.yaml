@@ -1,0 +1,59 @@
+steps:
+  # Step 1: Authenticate with Google Cloud
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Authenticate with GCP using the Cloud Build service account
+        echo $GOOGLE_APPLICATION_CREDENTIALS | base64 --decode > /workspace/gcloud-credentials.json
+        gcloud auth activate-service-account --key-file=/workspace/gcloud-credentials.json
+        gcloud config set project YOUR_PROJECT_ID
+
+  # Step 2: Configure Docker to push to GCR
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud auth configure-docker
+
+  # Step 3: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/silent-bird-449718-j2/my-web-app'
+      - '.'
+
+  # Step 4: Push the Docker image to GCR
+  - name: 'gcr.io/silent-bird-449718-j2/docker'
+    args:
+      - 'push'
+      - 'gcr.io/silent-bird-449718-j2/my-web-app'
+
+  # Step 5: Deploy the Docker image to GKE
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'container'
+      - 'clusters'
+      - 'get-credentials'
+      - 'my-cluster'
+      - '--zone'
+      - 'us-central1-a'
+      - '--project'
+      - 'YOUR_PROJECT_ID'
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - 'apply'
+      - '-f'
+      - 'deployment.yaml'
+    
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - 'rollout'
+      - 'status'
+      - 'deployment/my-web-app-deployment'
+      
+timeout: 1200s

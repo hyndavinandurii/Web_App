@@ -1,5 +1,5 @@
 options:
-  logs_bucket: gs://logs_bucket
+  logs_bucket: gs://my_logs_bucket
 steps:
   # Step 1: Authenticate with Google Cloud
   - name: 'gcr.io/cloud-builders/gcloud'
